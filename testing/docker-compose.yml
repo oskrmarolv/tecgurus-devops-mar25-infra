@@ -16,7 +16,7 @@ services:
     networks:
       - tecgurus
 
-  test_cmemcach:
+  test_memcach:
     container_name: tecgurus_memcach
     image: redis:latest
     networks:
@@ -33,14 +33,14 @@ services:
           memory: 1024M
     depends_on:
       - test_database
-      - test_cmemcach
+      - test_memcach
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=testing
       - PORT=3000
       - COOKIE_SECRET=bbf6ab698ab80c96548c42381ef310af17959ef3944d0382ab480eacad97da3b
-      - DATABASE_REDIS_HOST=test_cmemcach
+      - DATABASE_REDIS_HOST=test_memcach
       - DATABASE_REDIS_PORT=6379
       - DATABASE_MONGODB_HOST=test_database
       - DATABASE_MONGODB_PORT=27017
