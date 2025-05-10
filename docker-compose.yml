@@ -1,0 +1,64 @@
+# docker-compose
+#   crear un contenedor con la app
+#   crear un contenedor con un servicio MongoDB (database)
+#   crear un contenedor con un servicio Redis (memcach)
+#
+# app debe poder conectarse con database y memcach
+
+
+version: '3.8'
+
+services:
+
+  cdatabase:
+    container_name: tecgurus_database
+    image: mongo:latest
+    # ports:
+    #   - "27017:27017"
+    volumes:
+      - /home/guest/Projects/DevOps_desde_cero-Mar2025/exercises/devops_reources/mongodb:/data/db
+    networks:
+      - tecgurus
+
+  cmemcach:
+    container_name: tecgurus_memcach
+    image: redis:latest
+    # ports:
+    #   - "6379:6379"
+    networks:
+      - tecgurus
+
+  capp:
+    # build: .
+    image: tecgurus/devops:ejemplo-001
+    container_name: tecgurus_app
+    deploy: 
+      resources:
+        limits:   
+          cpus: "1"
+          memory: 1024M
+    depends_on:
+      - cmemcach
+      - cdatabase
+    # ports:
+    #   - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - COOKIE_SECRET=bbf6ab698ab80c96548c42381ef310af17959ef3944d0382ab480eacad97da3b
+      - DATABASE_REDIS_HOST=cmemcach
+      - DATABASE_REDIS_PORT=6379
+      - DATABASE_MONGODB_HOST=cdatabase
+      - DATABASE_MONGODB_PORT=27017
+    volumes:
+      - /home/guest/Projects/DevOps_desde_cero-Mar2025/exercises/devops_app_repo:/container/app
+    networks:
+      - tecgurus
+
+
+networks:
+
+  tecgurus:
+    driver: bridge      # overlan, nat, host, ...
+    internal: true
+
